@@ -14,6 +14,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
     { id: 'home', label: 'Home', icon: Home },
     { id: 'search', label: 'Search', icon: Search },
     { id: 'library', label: 'Your Library', icon: Library },
+    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   const secondaryItems = [
@@ -23,19 +24,19 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
 
   return (
     <div 
-      className="hidden md:flex flex-col w-64 min-h-screen p-6 border-r border-opacity-20"
+      className="flex flex-col w-20 md:w-64 min-h-screen p-2 md:p-6 border-r border-opacity-20"
       style={{ 
         backgroundColor: theme.secondary,
         borderColor: theme.text,
       }}
     >
-      <div className="flex items-center mb-8">
-        <div 
-          className="w-8 h-8 rounded-full mr-3"
+      <div className="flex items-center justify-center md:justify-start mb-8">
+        <div
+          className="w-8 h-8 rounded-full md:mr-3"
           style={{ backgroundColor: theme.primary }}
         />
-        <h1 
-          className="text-xl font-bold"
+        <h1
+          className="hidden md:block text-xl font-bold"
           style={{ color: theme.text }}
         >
           MusicPlayer
@@ -51,7 +52,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
               <li key={item.id}>
                 <button
                   onClick={() => onTabChange(item.id)}
-                  className={`flex items-center w-full p-3 rounded-lg transition-all duration-200 ${
+                  className={`flex items-center justify-center md:justify-start w-full p-3 rounded-lg transition-all duration-200 ${
                     isActive ? 'bg-opacity-20' : 'hover:bg-opacity-10'
                   }`}
                   style={{
@@ -59,23 +60,23 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
                     color: isActive ? theme.text : theme.text + '80',
                   }}
                 >
-                  <Icon size={20} className="mr-3" />
-                  <span className="font-medium">{item.label}</span>
+                  <Icon size={20} className="md:mr-3" />
+                  <span className="hidden md:block font-medium">{item.label}</span>
                 </button>
               </li>
             );
           })}
         </ul>
 
-        <div className="mt-8">
+        <div className="mt-8 hidden md:block">
           <div className="flex items-center justify-between mb-4">
-            <h2 
+            <h2
               className="text-sm font-semibold opacity-60"
               style={{ color: theme.text }}
             >
               Recently Created
             </h2>
-            <button 
+            <button
               className="p-1 rounded hover:bg-opacity-10 transition-colors"
               style={{ color: theme.text }}
             >
@@ -90,7 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
                 <li key={item.id}>
                   <button
                     onClick={() => onTabChange(item.id)}
-                    className={`flex items-center w-full p-3 rounded-lg transition-all duration-200 ${
+                    className={`flex items-center justify-center md:justify-start w-full p-3 rounded-lg transition-all duration-200 ${
                       isActive ? 'bg-opacity-20' : 'hover:bg-opacity-10'
                     }`}
                     style={{
@@ -98,8 +99,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
                       color: isActive ? theme.text : theme.text + '80',
                     }}
                   >
-                    <Icon size={20} className="mr-3" />
-                    <span className="font-medium">{item.label}</span>
+                    <Icon size={20} className="md:mr-3" />
+                    <span className="hidden md:block font-medium">{item.label}</span>
                   </button>
                 </li>
               );

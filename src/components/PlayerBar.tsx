@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Volume2, Repeat, Shuffle, Heart } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Volume2, Repeat, Shuffle, Heart, X } from 'lucide-react';
 import { usePlayer } from '../contexts/PlayerContext';
 import { useTheme } from '../contexts/ThemeContext';
 import EnhancedButton from './EnhancedButton';
@@ -13,14 +13,15 @@ const PlayerBar: React.FC<PlayerBarProps> = ({ onNowPlayingClick }) => {
   const { theme } = useTheme();
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [isPlayerBarHidden, setIsPlayerBarHidden] = useState(false);
 
   useEffect(() => {
-    if (playerState.currentSong) {
+    if (playerState.currentSong && !isPlayerBarHidden) {
       setIsVisible(true);
     } else {
       setIsVisible(false);
     }
-  }, [playerState.currentSong]);
+  }, [playerState.currentSong, isPlayerBarHidden]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -41,8 +42,8 @@ const PlayerBar: React.FC<PlayerBarProps> = ({ onNowPlayingClick }) => {
 
   return (
     <div
-      className={`fixed bottom-16 md:bottom-0 left-0 right-0 border-t border-opacity-20 backdrop-blur-lg p-4 z-40 transition-all duration-500 ease-in-out ${
-        isVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
+      className={`fixed bottom-0 left-0 right-0 border-t border-opacity-20 backdrop-blur-lg p-4 z-40 transition-all duration-500 ease-in-out ${
+        isVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'
       }`}
       style={{
         backgroundColor: theme.secondary + 'F0',

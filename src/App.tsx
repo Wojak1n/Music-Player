@@ -4,7 +4,7 @@ import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { PlayerProvider, usePlayer } from './contexts/PlayerContext';
 import { ToastProvider } from './contexts/ToastContext';
 import Sidebar from './components/Sidebar';
-import MobileNavigation from './components/MobileNavigation';
+import FloatingActionButton from './components/FloatingActionButton';
 import MobileNowPlaying from './components/MobileNowPlaying';
 import PlayerBar from './components/PlayerBar';
 import HomePage from './pages/HomePage';
@@ -58,15 +58,16 @@ const AppContent: React.FC = () => {
       >
         <div className="flex">
           <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-          <main className={`flex-1 p-6 ${playerState.currentSong ? 'pb-40' : 'pb-20'} md:pb-24`}>
+          <main className={`flex-1 p-6 ${playerState.currentSong ? 'pb-24' : 'pb-6'} md:pb-24`}>
             <div className="max-w-7xl mx-auto">
               {renderContent()}
             </div>
           </main>
         </div>
-        <MobileNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+
         <MobileNowPlaying onNowPlayingClick={() => setActiveTab('nowplaying')} />
         <PlayerBar onNowPlayingClick={() => setActiveTab('nowplaying')} />
+        <FloatingActionButton onSettingsClick={() => setActiveTab('settings')} />
       </div>
     </Router>
   );

@@ -10,6 +10,8 @@ interface MobileNavigationProps {
 const MobileNavigation: React.FC<MobileNavigationProps> = ({ activeTab, onTabChange }) => {
   const { theme } = useTheme();
 
+  console.log('MobileNavigation rendered, activeTab:', activeTab);
+
   const tabs = [
     { id: 'home', label: 'Home', icon: Home },
     { id: 'search', label: 'Search', icon: Search },
@@ -20,23 +22,32 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({ activeTab, onTabCha
 
   return (
     <div 
-      className="md:hidden fixed bottom-0 left-0 right-0 border-t border-opacity-20 backdrop-blur-lg z-50"
-      style={{ 
-        backgroundColor: theme.secondary + 'E6',
-        borderColor: theme.text,
+      className="fixed bottom-0 left-0 right-0 border-t-2 border-opacity-50 backdrop-blur-lg z-[9999]"
+      style={{
+        backgroundColor: theme.isDark ? '#1a1a1a' : '#ffffff',
+        borderColor: theme.primary,
+        boxShadow: '0 -4px 20px rgba(0,0,0,0.3)',
       }}
     >
-      <div className="flex items-center justify-around py-2">
+      <div className="flex items-center justify-around py-3 px-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
-              onClick={() => onTabChange(tab.id)}
-              className="flex flex-col items-center p-2 rounded-lg transition-all duration-200"
+              onClick={() => {
+                console.log('Mobile nav button clicked:', tab.id);
+                if (tab.id === 'settings') {
+                  alert('Settings button clicked!');
+                }
+                onTabChange(tab.id);
+              }}
+              className="flex flex-col items-center p-3 rounded-lg transition-all duration-200 min-w-0 flex-1"
               style={{
                 color: isActive ? theme.primary : theme.text + '80',
+                backgroundColor: tab.id === 'settings' ? '#ff0000' : (isActive ? theme.primary + '20' : 'transparent'),
+                border: tab.id === 'settings' ? '2px solid #ff0000' : 'none',
               }}
             >
               <Icon size={20} className="mb-1" />
