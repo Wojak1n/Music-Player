@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #1DB954;
+  --secondary: #191414;
+  --accent: #1ED760;
+  --background: #121212;
+  --text: #FFFFFF;
+  --bg-image: none;
+}
+
+body {
+  background: var(--background);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg-image);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  opacity: 0.1;
+  z-index: -1;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* Smooth transitions */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Audio visualizer styles */
+.visualizer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  gap: 2px;
+}
+
+.visualizer-bar {
+  width: 3px;
+  background: var(--primary);
+  border-radius: 2px;
+  animation: visualize 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes visualize {
+  0% { height: 4px; }
+  100% { height: 20px; }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .mobile-player-bar {
+    bottom: 60px;
+  }
+}
+
+/* Glassmorphism effects */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* PWA styles */
+@media (display-mode: standalone) {
+  body {
+    user-select: none;
+  }
+  
+  .app-header {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .app-content {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+  }
+}
