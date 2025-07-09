@@ -36,8 +36,70 @@ const PlayerBar: React.FC<PlayerBarProps> = ({ onNowPlayingClick }) => {
     setCurrentTime(newTime);
   };
 
+  const handleClosePlayer = () => {
+    setIsPlayerBarHidden(true);
+  };
+
+  const handleShowPlayer = () => {
+    setIsPlayerBarHidden(false);
+  };
+
   if (!playerState.currentSong) {
     return null;
+  }
+
+  // If player is hidden, show a small restore button with song info
+  if (isPlayerBarHidden) {
+    return (
+      <div className="fixed bottom-4 right-4 z-50">
+        <div className="flex items-center space-x-3">
+          {/* Mini song info */}
+          <div
+            className="hidden md:flex items-center space-x-2 px-3 py-2 rounded-lg shadow-lg backdrop-blur-lg border border-opacity-20"
+            style={{
+              backgroundColor: theme.secondary + 'E6',
+              borderColor: theme.text + '20',
+              color: theme.text,
+            }}
+          >
+            <div className="w-8 h-8 bg-gray-700 rounded overflow-hidden">
+              {playerState.currentSong?.thumbnail ? (
+                <img
+                  src={playerState.currentSong.thumbnail}
+                  alt={playerState.currentSong.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div
+                  className="w-full h-full flex items-center justify-center text-xs font-bold"
+                  style={{ backgroundColor: theme.primary, color: theme.isDark ? '#000' : '#fff' }}
+                >
+                  {playerState.currentSong?.title.charAt(0)}
+                </div>
+              )}
+            </div>
+            <div className="text-xs">
+              <div className="font-medium truncate max-w-32">{playerState.currentSong?.title}</div>
+              <div className="opacity-70 truncate max-w-32">{playerState.currentSong?.artist}</div>
+            </div>
+          </div>
+
+          {/* Restore button */}
+          <button
+            onClick={handleShowPlayer}
+            className="w-12 h-12 rounded-full shadow-lg backdrop-blur-lg border border-opacity-20 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
+            style={{
+              backgroundColor: theme.primary + 'E6',
+              borderColor: theme.text + '20',
+              color: theme.isDark ? '#000' : '#fff',
+            }}
+            title="Show Player"
+          >
+            <Play size={20} />
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -178,7 +240,7 @@ const PlayerBar: React.FC<PlayerBarProps> = ({ onNowPlayingClick }) => {
           </div>
         </div>
 
-        {/* Volume Control */}
+        {/* Volume Control & Close Button */}
         <div className="flex items-center space-x-2 flex-1 justify-end">
           <div className="relative">
             <button
@@ -209,6 +271,17 @@ const PlayerBar: React.FC<PlayerBarProps> = ({ onNowPlayingClick }) => {
               </div>
             )}
           </div>
+
+          {/* Close Player Button */}
+          <EnhancedButton
+            onClick={handleClosePlayer}
+            variant="icon"
+            className="ml-2"
+            style={{ color: theme.text + '80' }}
+            title="Hide Player"
+          >
+            <X size={18} />
+          </EnhancedButton>
         </div>
       </div>
     </div>

@@ -58,7 +58,7 @@ const AppContent: React.FC = () => {
       >
         <div className="flex">
           <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-          <main className={`flex-1 p-6 ${playerState.currentSong ? 'pb-24' : 'pb-6'} md:pb-24`}>
+          <main className="flex-1 p-6 pb-6 md:pb-24">
             <div className="max-w-7xl mx-auto">
               {renderContent()}
             </div>

@@ -5,9 +5,10 @@ import { useTheme } from '../contexts/ThemeContext';
 
 interface FloatingActionButtonProps {
   onSettingsClick: () => void;
+  onMinimizePlayer?: () => void;
 }
 
-const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({ onSettingsClick }) => {
+const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({ onSettingsClick, onMinimizePlayer }) => {
   const { playerState } = usePlayer();
   const { theme } = useTheme();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -52,20 +53,22 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({ onSettingsC
             </button>
 
             {/* Minimize player button */}
-            <button
-              onClick={() => {
-                // This could minimize the player or hide it temporarily
-                setIsExpanded(false);
-              }}
-              className="w-12 h-12 rounded-full shadow-lg backdrop-blur-lg border border-opacity-20 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
-              style={{
-                backgroundColor: theme.secondary + 'E6',
-                borderColor: theme.text + '20',
-                color: theme.text,
-              }}
-            >
-              <Minimize2 size={20} />
-            </button>
+            {onMinimizePlayer && (
+              <button
+                onClick={() => {
+                  onMinimizePlayer();
+                  setIsExpanded(false);
+                }}
+                className="w-12 h-12 rounded-full shadow-lg backdrop-blur-lg border border-opacity-20 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
+                style={{
+                  backgroundColor: theme.secondary + 'E6',
+                  borderColor: theme.text + '20',
+                  color: theme.text,
+                }}
+              >
+                <Minimize2 size={20} />
+              </button>
+            )}
           </div>
         )}
       </div>
