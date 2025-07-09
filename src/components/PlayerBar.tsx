@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Volume2, Repeat, Shuffle, Heart, X } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Volume1, Repeat, Shuffle, Heart, X } from 'lucide-react';
 import { usePlayer } from '../contexts/PlayerContext';
 import { useTheme } from '../contexts/ThemeContext';
-import EnhancedButton from './EnhancedButton';
 
 interface PlayerBarProps {
-  onNowPlayingClick?: () => void;
+  onNowPlayingClick: () => void;
 }
 
 const PlayerBar: React.FC<PlayerBarProps> = ({ onNowPlayingClick }) => {
   const { playerState, playPause, nextSong, previousSong, setVolume, setCurrentTime, toggleRepeat, toggleShuffle } = usePlayer();
   const { theme } = useTheme();
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+  const [previousVolume, setPreviousVolume] = useState(0.7);
   const [isVisible, setIsVisible] = useState(false);
   const [isPlayerBarHidden, setIsPlayerBarHidden] = useState(false);
 
@@ -37,67 +37,54 @@ const PlayerBar: React.FC<PlayerBarProps> = ({ onNowPlayingClick }) => {
   };
 
   const handleClosePlayer = () => {
+    console.log('Close player button clicked!');
     setIsPlayerBarHidden(true);
   };
 
   const handleShowPlayer = () => {
+    console.log('Show player button clicked!');
     setIsPlayerBarHidden(false);
+  };
+
+  const toggleMute = () => {
+    if (playerState.volume > 0) {
+      setPreviousVolume(playerState.volume);
+      setVolume(0);
+    } else {
+      setVolume(previousVolume);
+    }
+  };
+
+  const getVolumeIcon = () => {
+    if (playerState.volume === 0) {
+      return <VolumeX size={20} />;
+    } else if (playerState.volume < 0.5) {
+      return <Volume1 size={20} />;
+    } else {
+      return <Volume2 size={20} />;
+    }
   };
 
   if (!playerState.currentSong) {
     return null;
   }
 
-  // If player is hidden, show a small restore button with song info
+  // If player is hidden, show a small restore button
   if (isPlayerBarHidden) {
     return (
       <div className="fixed bottom-4 right-4 z-50">
-        <div className="flex items-center space-x-3">
-          {/* Mini song info */}
-          <div
-            className="hidden md:flex items-center space-x-2 px-3 py-2 rounded-lg shadow-lg backdrop-blur-lg border border-opacity-20"
-            style={{
-              backgroundColor: theme.secondary + 'E6',
-              borderColor: theme.text + '20',
-              color: theme.text,
-            }}
-          >
-            <div className="w-8 h-8 bg-gray-700 rounded overflow-hidden">
-              {playerState.currentSong?.thumbnail ? (
-                <img
-                  src={playerState.currentSong.thumbnail}
-                  alt={playerState.currentSong.title}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div
-                  className="w-full h-full flex items-center justify-center text-xs font-bold"
-                  style={{ backgroundColor: theme.primary, color: theme.isDark ? '#000' : '#fff' }}
-                >
-                  {playerState.currentSong?.title.charAt(0)}
-                </div>
-              )}
-            </div>
-            <div className="text-xs">
-              <div className="font-medium truncate max-w-32">{playerState.currentSong?.title}</div>
-              <div className="opacity-70 truncate max-w-32">{playerState.currentSong?.artist}</div>
-            </div>
-          </div>
-
-          {/* Restore button */}
-          <button
-            onClick={handleShowPlayer}
-            className="w-12 h-12 rounded-full shadow-lg backdrop-blur-lg border border-opacity-20 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
-            style={{
-              backgroundColor: theme.primary + 'E6',
-              borderColor: theme.text + '20',
-              color: theme.isDark ? '#000' : '#fff',
-            }}
-            title="Show Player"
-          >
-            <Play size={20} />
-          </button>
-        </div>
+        <button
+          onClick={handleShowPlayer}
+          className="w-12 h-12 rounded-full shadow-lg backdrop-blur-lg border border-opacity-20 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
+          style={{
+            backgroundColor: theme.primary + 'E6',
+            borderColor: theme.text + '20',
+            color: theme.isDark ? '#000' : '#fff',
+          }}
+          title="Show Player"
+        >
+          <Play size={20} />
+        </button>
       </div>
     );
   }
@@ -117,122 +104,107 @@ const PlayerBar: React.FC<PlayerBarProps> = ({ onNowPlayingClick }) => {
         <div className="flex items-center space-x-4 flex-1 min-w-0">
           <button
             onClick={onNowPlayingClick}
-            className="flex items-center space-x-3 hover:bg-opacity-10 rounded-lg p-2 transition-colors flex-1 min-w-0"
-            style={{ backgroundColor: 'transparent' }}
+            className="w-16 h-16 bg-gray-700 rounded-lg overflow-hidden hover:scale-105 transition-transform"
           >
-            <div className="w-12 h-12 bg-gray-700 rounded-lg flex-shrink-0 overflow-hidden">
-              {playerState.currentSong.thumbnail ? (
-                <img
-                  src={playerState.currentSong.thumbnail}
-                  alt={playerState.currentSong.title}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div
-                  className="w-full h-full flex items-center justify-center"
-                  style={{ backgroundColor: theme.primary }}
-                >
-                  <span className="text-white text-lg font-bold">
-                    {playerState.currentSong.title.charAt(0)}
-                  </span>
-                </div>
-              )}
-            </div>
-            <div className="min-w-0 flex-1 text-left">
-              <h4
-                className="font-medium truncate"
-                style={{ color: theme.text }}
+            {playerState.currentSong?.thumbnail ? (
+              <img 
+                src={playerState.currentSong.thumbnail} 
+                alt={playerState.currentSong.title}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div 
+                className="w-full h-full flex items-center justify-center text-xl font-bold"
+                style={{ backgroundColor: theme.primary, color: theme.isDark ? '#000' : '#fff' }}
               >
-                {playerState.currentSong.title}
-              </h4>
-              <p
-                className="text-sm opacity-70 truncate"
-                style={{ color: theme.text }}
-              >
-                {playerState.currentSong.artist}
-              </p>
-            </div>
+                {playerState.currentSong?.title.charAt(0)}
+              </div>
+            )}
           </button>
-          <button 
-            className="p-2 hover:bg-opacity-10 rounded-full transition-colors"
-            style={{ color: theme.text }}
-          >
-            <Heart size={20} />
-          </button>
+          
+          <div className="min-w-0 flex-1">
+            <h3 
+              className="font-semibold truncate"
+              style={{ color: theme.text }}
+            >
+              {playerState.currentSong?.title}
+            </h3>
+            <p 
+              className="text-sm opacity-70 truncate"
+              style={{ color: theme.text }}
+            >
+              {playerState.currentSong?.artist}
+            </p>
+          </div>
         </div>
 
         {/* Player Controls */}
         <div className="flex flex-col items-center space-y-2 flex-1 max-w-md">
           <div className="flex items-center space-x-4">
-            <EnhancedButton
+            <button
               onClick={toggleShuffle}
-              variant="icon"
-              style={{
-                color: playerState.shuffle ? theme.primary : theme.text + '80'
-              }}
+              className="p-2 hover:bg-opacity-10 rounded-full transition-colors"
+              style={{ color: playerState.shuffle ? theme.primary : theme.text + '60' }}
             >
-              <Shuffle size={20} />
-            </EnhancedButton>
-            <EnhancedButton
+              <Shuffle size={18} />
+            </button>
+            
+            <button
               onClick={previousSong}
-              variant="icon"
+              className="p-2 hover:bg-opacity-10 rounded-full transition-colors"
               style={{ color: theme.text }}
             >
               <SkipBack size={20} />
-            </EnhancedButton>
-            <EnhancedButton
+            </button>
+            
+            <button
               onClick={playPause}
-              variant="primary"
-              className="!p-3 !rounded-full"
+              className="w-10 h-10 rounded-full flex items-center justify-center hover:scale-105 transition-all"
+              style={{ backgroundColor: theme.primary, color: theme.isDark ? '#000' : '#fff' }}
             >
-              {playerState.isPlaying ? <Pause size={24} /> : <Play size={24} />}
-            </EnhancedButton>
-            <EnhancedButton
+              {playerState.isPlaying ? <Pause size={20} /> : <Play size={20} />}
+            </button>
+            
+            <button
               onClick={nextSong}
-              variant="icon"
+              className="p-2 hover:bg-opacity-10 rounded-full transition-colors"
               style={{ color: theme.text }}
             >
               <SkipForward size={20} />
-            </EnhancedButton>
-            <EnhancedButton
+            </button>
+            
+            <button
               onClick={toggleRepeat}
-              variant="icon"
-              style={{
-                color: playerState.repeat ? theme.primary : theme.text + '80'
-              }}
+              className="p-2 hover:bg-opacity-10 rounded-full transition-colors"
+              style={{ color: playerState.repeat ? theme.primary : theme.text + '60' }}
             >
-              <Repeat size={20} />
-            </EnhancedButton>
+              <Repeat size={18} />
+            </button>
           </div>
 
           {/* Progress Bar */}
           <div className="flex items-center space-x-2 w-full">
             <span 
-              className="text-xs opacity-70"
+              className="text-xs opacity-70 min-w-[40px]"
               style={{ color: theme.text }}
             >
               {formatTime(playerState.currentTime)}
             </span>
-            <div
-              className="flex-1 h-1 bg-opacity-20 rounded-full cursor-pointer relative group"
+            <div 
+              className="flex-1 h-1 bg-opacity-20 rounded-full cursor-pointer"
               style={{ backgroundColor: theme.text }}
               onClick={handleProgressClick}
             >
-              <div
-                className="h-full rounded-full transition-all duration-200 relative"
-                style={{
+              <div 
+                className="h-full rounded-full transition-all duration-200"
+                style={{ 
                   backgroundColor: theme.primary,
-                  width: `${playerState.duration > 0 ? (playerState.currentTime / playerState.duration) * 100 : 0}%`
+                  width: `${(playerState.currentTime / playerState.duration) * 100}%`
                 }}
-              >
-                <div
-                  className="absolute right-0 top-1/2 transform -translate-y-1/2 w-3 h-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                  style={{ backgroundColor: theme.primary }}
-                />
-              </div>
+              />
             </div>
             <span 
-              className="text-xs opacity-70"
+              className="text-xs opacity-70 min-w-[40px]"
               style={{ color: theme.text }}
             >
               {formatTime(playerState.duration)}
@@ -244,17 +216,23 @@ const PlayerBar: React.FC<PlayerBarProps> = ({ onNowPlayingClick }) => {
         <div className="flex items-center space-x-2 flex-1 justify-end">
           <div className="relative">
             <button
+              onClick={toggleMute}
               onMouseEnter={() => setShowVolumeSlider(true)}
               onMouseLeave={() => setShowVolumeSlider(false)}
-              className="p-2 hover:bg-opacity-10 rounded-full transition-colors"
-              style={{ color: theme.text }}
+              className="p-2 hover:bg-opacity-10 rounded-full transition-all duration-200 hover:scale-110"
+              style={{ color: playerState.volume === 0 ? '#ef4444' : theme.text }}
+              title={playerState.volume === 0 ? 'Unmute' : 'Mute'}
             >
-              <Volume2 size={20} />
+              {getVolumeIcon()}
             </button>
+
             {showVolumeSlider && (
               <div 
-                className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 p-2 rounded-lg backdrop-blur-lg"
-                style={{ backgroundColor: theme.secondary + 'E6' }}
+                className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 p-3 rounded-lg backdrop-blur-lg border border-opacity-20 shadow-lg"
+                style={{ 
+                  backgroundColor: theme.secondary + 'F0',
+                  borderColor: theme.text + '20'
+                }}
                 onMouseEnter={() => setShowVolumeSlider(true)}
                 onMouseLeave={() => setShowVolumeSlider(false)}
               >
@@ -265,23 +243,22 @@ const PlayerBar: React.FC<PlayerBarProps> = ({ onNowPlayingClick }) => {
                   step="0.01"
                   value={playerState.volume}
                   onChange={(e) => setVolume(parseFloat(e.target.value))}
-                  className="w-20 h-1 bg-opacity-20 rounded-lg appearance-none cursor-pointer"
-                  style={{ backgroundColor: theme.text }}
+                  className="w-20 h-2 bg-opacity-30 rounded-lg appearance-none cursor-pointer volume-slider"
+                  style={{ backgroundColor: theme.text + '30' }}
                 />
               </div>
             )}
           </div>
 
           {/* Close Player Button */}
-          <EnhancedButton
+          <button
             onClick={handleClosePlayer}
-            variant="icon"
-            className="ml-2"
-            style={{ color: theme.text + '80' }}
+            className="ml-2 p-2 hover:bg-red-500 hover:bg-opacity-20 rounded-full transition-colors border border-red-500 border-opacity-50"
+            style={{ color: '#ef4444' }}
             title="Hide Player"
           >
             <X size={18} />
-          </EnhancedButton>
+          </button>
         </div>
       </div>
     </div>
