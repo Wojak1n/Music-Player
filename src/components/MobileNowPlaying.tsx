@@ -17,7 +17,7 @@ const MobileNowPlaying: React.FC<MobileNowPlayingProps> = ({ onNowPlayingClick }
 
   return (
     <div 
-      className="md:hidden fixed bottom-16 left-4 right-4 rounded-lg border border-opacity-20 backdrop-blur-lg shadow-lg"
+      className="md:hidden fixed bottom-32 left-4 right-4 rounded-lg border border-opacity-20 backdrop-blur-lg shadow-lg z-30"
       style={{ 
         backgroundColor: theme.secondary + 'F0',
         borderColor: theme.text,

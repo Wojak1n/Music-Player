@@ -148,7 +148,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       : playerState.currentIndex - 1;
   };
 
-  const nextSong = async () => {
+  const nextSong = () => {
     if (playerState.queue.length === 0) return;
 
     const nextIndex = getNextIndex();
@@ -164,17 +164,15 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (audio) {
       audio.src = nextSong.url;
       if (playerState.isPlaying) {
-        try {
-          await audio.play();
-        } catch (error) {
+        audio.play().catch(error => {
           console.error('Error playing next song:', error);
           setPlayerState(prev => ({ ...prev, isPlaying: false }));
-        }
+        });
       }
     }
   };
 
-  const previousSong = async () => {
+  const previousSong = () => {
     if (playerState.queue.length === 0) return;
 
     const prevIndex = getPreviousIndex();
@@ -190,12 +188,10 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (audio) {
       audio.src = prevSong.url;
       if (playerState.isPlaying) {
-        try {
-          await audio.play();
-        } catch (error) {
+        audio.play().catch(error => {
           console.error('Error playing previous song:', error);
           setPlayerState(prev => ({ ...prev, isPlaying: false }));
-        }
+        });
       }
     }
   };

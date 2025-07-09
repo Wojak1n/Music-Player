@@ -20,7 +20,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({ activeTab, onTabCha
 
   return (
     <div 
-      className="md:hidden fixed bottom-0 left-0 right-0 border-t border-opacity-20 backdrop-blur-lg"
+      className="md:hidden fixed bottom-0 left-0 right-0 border-t border-opacity-20 backdrop-blur-lg z-50"
       style={{ 
         backgroundColor: theme.secondary + 'E6',
         borderColor: theme.text,

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
-import { PlayerProvider } from './contexts/PlayerContext';
+import { PlayerProvider, usePlayer } from './contexts/PlayerContext';
 import { ToastProvider } from './contexts/ToastContext';
 import Sidebar from './components/Sidebar';
 import MobileNavigation from './components/MobileNavigation';
@@ -21,6 +21,7 @@ const AppContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [songs, setSongs] = useState<Song[]>([]);
   const { theme } = useTheme();
+  const { playerState } = usePlayer();
 
   const handleSongUpload = (song: Song) => {
     setSongs(prev => [...prev, song]);
@@ -57,7 +58,7 @@ const AppContent: React.FC = () => {
       >
         <div className="flex">
           <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-          <main className="flex-1 p-6 pb-32 md:pb-24">
+          <main className={`flex-1 p-6 ${playerState.currentSong ? 'pb-40' : 'pb-20'} md:pb-24`}>
             <div className="max-w-7xl mx-auto">
               {renderContent()}
             </div>

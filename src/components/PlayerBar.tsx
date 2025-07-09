@@ -41,7 +41,7 @@ const PlayerBar: React.FC<PlayerBarProps> = ({ onNowPlayingClick }) => {
 
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 md:bottom-0 border-t border-opacity-20 backdrop-blur-lg p-4 transition-all duration-500 ease-in-out ${
+      className={`fixed bottom-16 md:bottom-0 left-0 right-0 border-t border-opacity-20 backdrop-blur-lg p-4 z-40 transition-all duration-500 ease-in-out ${
         isVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
       }`}
       style={{
