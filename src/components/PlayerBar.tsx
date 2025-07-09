@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Volume2, Repeat, Shuffle, Heart } from 'lucide-react';
 import { usePlayer } from '../contexts/PlayerContext';
 import { useTheme } from '../contexts/ThemeContext';
+import EnhancedButton from './EnhancedButton';
 
 interface PlayerBarProps {
   onNowPlayingClick?: () => void;
@@ -11,6 +12,15 @@ const PlayerBar: React.FC<PlayerBarProps> = ({ onNowPlayingClick }) => {
   const { playerState, playPause, nextSong, previousSong, setVolume, setCurrentTime, toggleRepeat, toggleShuffle } = usePlayer();
   const { theme } = useTheme();
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    if (playerState.currentSong) {
+      setIsVisible(true);
+    } else {
+      setIsVisible(false);
+    }
+  }, [playerState.currentSong]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -30,9 +40,11 @@ const PlayerBar: React.FC<PlayerBarProps> = ({ onNowPlayingClick }) => {
   }
 
   return (
-    <div 
-      className="fixed bottom-0 left-0 right-0 md:bottom-0 border-t border-opacity-20 backdrop-blur-lg p-4"
-      style={{ 
+    <div
+      className={`fixed bottom-0 left-0 right-0 md:bottom-0 border-t border-opacity-20 backdrop-blur-lg p-4 transition-all duration-500 ease-in-out ${
+        isVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
+      }`}
+      style={{
         backgroundColor: theme.secondary + 'F0',
         borderColor: theme.text,
       }}
@@ -89,48 +101,45 @@ const PlayerBar: React.FC<PlayerBarProps> = ({ onNowPlayingClick }) => {
         {/* Player Controls */}
         <div className="flex flex-col items-center space-y-2 flex-1 max-w-md">
           <div className="flex items-center space-x-4">
-            <button
+            <EnhancedButton
               onClick={toggleShuffle}
-              className="p-2 hover:bg-opacity-10 rounded-full transition-colors"
-              style={{ 
-                color: playerState.shuffle ? theme.primary : theme.text + '80' 
+              variant="icon"
+              style={{
+                color: playerState.shuffle ? theme.primary : theme.text + '80'
               }}
             >
               <Shuffle size={20} />
-            </button>
-            <button
+            </EnhancedButton>
+            <EnhancedButton
               onClick={previousSong}
-              className="p-2 hover:bg-opacity-10 rounded-full transition-colors"
+              variant="icon"
               style={{ color: theme.text }}
             >
               <SkipBack size={20} />
-            </button>
-            <button
+            </EnhancedButton>
+            <EnhancedButton
               onClick={playPause}
-              className="p-3 rounded-full transition-all duration-200 hover:scale-105"
-              style={{ 
-                backgroundColor: theme.primary,
-                color: theme.isDark ? '#000' : '#fff'
-              }}
+              variant="primary"
+              className="!p-3 !rounded-full"
             >
               {playerState.isPlaying ? <Pause size={24} /> : <Play size={24} />}
-            </button>
-            <button
+            </EnhancedButton>
+            <EnhancedButton
               onClick={nextSong}
-              className="p-2 hover:bg-opacity-10 rounded-full transition-colors"
+              variant="icon"
               style={{ color: theme.text }}
             >
               <SkipForward size={20} />
-            </button>
-            <button
+            </EnhancedButton>
+            <EnhancedButton
               onClick={toggleRepeat}
-              className="p-2 hover:bg-opacity-10 rounded-full transition-colors"
-              style={{ 
-                color: playerState.repeat ? theme.primary : theme.text + '80' 
+              variant="icon"
+              style={{
+                color: playerState.repeat ? theme.primary : theme.text + '80'
               }}
             >
               <Repeat size={20} />
-            </button>
+            </EnhancedButton>
           </div>
 
           {/* Progress Bar */}
@@ -141,18 +150,23 @@ const PlayerBar: React.FC<PlayerBarProps> = ({ onNowPlayingClick }) => {
             >
               {formatTime(playerState.currentTime)}
             </span>
-            <div 
-              className="flex-1 h-1 bg-opacity-20 rounded-full cursor-pointer"
+            <div
+              className="flex-1 h-1 bg-opacity-20 rounded-full cursor-pointer relative group"
               style={{ backgroundColor: theme.text }}
               onClick={handleProgressClick}
             >
-              <div 
-                className="h-full rounded-full transition-all duration-200"
-                style={{ 
+              <div
+                className="h-full rounded-full transition-all duration-200 relative"
+                style={{
                   backgroundColor: theme.primary,
-                  width: `${(playerState.currentTime / playerState.duration) * 100}%`
+                  width: `${playerState.duration > 0 ? (playerState.currentTime / playerState.duration) * 100 : 0}%`
                 }}
-              />
+              >
+                <div
+                  className="absolute right-0 top-1/2 transform -translate-y-1/2 w-3 h-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                  style={{ backgroundColor: theme.primary }}
+                />
+              </div>
             </div>
             <span 
               className="text-xs opacity-70"

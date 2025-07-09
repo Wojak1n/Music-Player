@@ -52,10 +52,14 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }));
     };
 
-    const handleEnded = () => {
+    const handleEnded = async () => {
       if (playerState.repeat) {
         audio.currentTime = 0;
-        audio.play();
+        try {
+          await audio.play();
+        } catch (error) {
+          console.error('Error repeating song:', error);
+        }
       } else {
         nextSong();
       }
@@ -79,20 +83,25 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
   }, [playerState.repeat]);
 
-  const playPause = () => {
+  const playPause = async () => {
     const audio = audioRef.current;
     if (!audio || !playerState.currentSong) return;
 
-    if (playerState.isPlaying) {
-      audio.pause();
-    } else {
-      audio.play();
+    try {
+      if (playerState.isPlaying) {
+        audio.pause();
+        setPlayerState(prev => ({ ...prev, isPlaying: false }));
+      } else {
+        await audio.play();
+        setPlayerState(prev => ({ ...prev, isPlaying: true }));
+      }
+    } catch (error) {
+      console.error('Error playing/pausing audio:', error);
+      setPlayerState(prev => ({ ...prev, isPlaying: false }));
     }
-    
-    setPlayerState(prev => ({ ...prev, isPlaying: !prev.isPlaying }));
   };
 
-  const playSong = (song: Song, queue?: Song[]) => {
+  const playSong = async (song: Song, queue?: Song[]) => {
     const audio = audioRef.current;
     if (!audio) return;
 
@@ -101,11 +110,18 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       currentSong: song,
       queue: queue || [song],
       currentIndex: queue ? queue.findIndex(s => s.id === song.id) : 0,
-      isPlaying: true,
+      isPlaying: false, // Set to false initially
     }));
 
     audio.src = song.url;
-    audio.play();
+
+    try {
+      await audio.play();
+      setPlayerState(prev => ({ ...prev, isPlaying: true }));
+    } catch (error) {
+      console.error('Error playing song:', error);
+      setPlayerState(prev => ({ ...prev, isPlaying: false }));
+    }
   };
 
   const getNextIndex = () => {
@@ -132,12 +148,12 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       : playerState.currentIndex - 1;
   };
 
-  const nextSong = () => {
+  const nextSong = async () => {
     if (playerState.queue.length === 0) return;
-    
+
     const nextIndex = getNextIndex();
     const nextSong = playerState.queue[nextIndex];
-    
+
     setPlayerState(prev => ({
       ...prev,
       currentSong: nextSong,
@@ -148,17 +164,22 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (audio) {
       audio.src = nextSong.url;
       if (playerState.isPlaying) {
-        audio.play();
+        try {
+          await audio.play();
+        } catch (error) {
+          console.error('Error playing next song:', error);
+          setPlayerState(prev => ({ ...prev, isPlaying: false }));
+        }
       }
     }
   };
 
-  const previousSong = () => {
+  const previousSong = async () => {
     if (playerState.queue.length === 0) return;
-    
+
     const prevIndex = getPreviousIndex();
     const prevSong = playerState.queue[prevIndex];
-    
+
     setPlayerState(prev => ({
       ...prev,
       currentSong: prevSong,
@@ -169,7 +190,12 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (audio) {
       audio.src = prevSong.url;
       if (playerState.isPlaying) {
-        audio.play();
+        try {
+          await audio.play();
+        } catch (error) {
+          console.error('Error playing previous song:', error);
+          setPlayerState(prev => ({ ...prev, isPlaying: false }));
+        }
       }
     }
   };

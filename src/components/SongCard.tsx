@@ -1,8 +1,9 @@
-import React from 'react';
-import { Play, MoreHorizontal, Heart, Plus } from 'lucide-react';
+import React, { useState } from 'react';
+import { Play, MoreHorizontal, Heart, Plus, Loader2 } from 'lucide-react';
 import { Song } from '../types';
 import { usePlayer } from '../contexts/PlayerContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { useToast } from '../contexts/ToastContext';
 
 interface SongCardProps {
   song: Song;
@@ -14,6 +15,9 @@ interface SongCardProps {
 const SongCard: React.FC<SongCardProps> = ({ song, index, showIndex, onAddToPlaylist }) => {
   const { playSong, addToQueue, playerState } = usePlayer();
   const { theme } = useTheme();
+  const toast = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const isCurrentSong = playerState.currentSong?.id === song.id;
 
@@ -23,12 +27,20 @@ const SongCard: React.FC<SongCardProps> = ({ song, index, showIndex, onAddToPlay
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handlePlay = () => {
-    playSong(song);
+  const handlePlay = async () => {
+    setIsLoading(true);
+    try {
+      playSong(song);
+      // Simulate loading time for better UX
+      setTimeout(() => setIsLoading(false), 500);
+    } catch (error) {
+      setIsLoading(false);
+    }
   };
 
   const handleAddToQueue = () => {
     addToQueue(song);
+    toast.showSuccess('Added to queue', `${song.title} by ${song.artist}`);
   };
 
   return (
@@ -52,27 +64,35 @@ const SongCard: React.FC<SongCardProps> = ({ song, index, showIndex, onAddToPlay
         )}
         <button
           onClick={handlePlay}
-          className={`${showIndex ? 'hidden' : 'flex'} group-hover:flex items-center justify-center w-8 h-8 rounded-full transition-all duration-200 hover:scale-110`}
-          style={{ 
+          disabled={isLoading}
+          className={`${showIndex ? 'hidden' : 'flex'} group-hover:flex items-center justify-center w-8 h-8 rounded-full transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed`}
+          style={{
             backgroundColor: theme.primary,
             color: theme.isDark ? '#000' : '#fff'
           }}
         >
-          <Play size={14} />
+          {isLoading ? <Loader2 size={14} className="animate-spin" /> : <Play size={14} />}
         </button>
       </div>
 
       {/* Song Info */}
       <div className="flex items-center flex-1 min-w-0">
-        <div className="w-12 h-12 bg-gray-700 rounded-lg mr-4 flex-shrink-0 overflow-hidden">
+        <div className="w-12 h-12 bg-gray-700 rounded-lg mr-4 flex-shrink-0 overflow-hidden relative">
           {song.thumbnail ? (
-            <img 
-              src={song.thumbnail} 
-              alt={song.title}
-              className="w-full h-full object-cover"
-            />
+            <>
+              {!imageLoaded && (
+                <div className="absolute inset-0 bg-gray-700 animate-pulse rounded-lg" />
+              )}
+              <img
+                src={song.thumbnail}
+                alt={song.title}
+                className={`w-full h-full object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                onLoad={() => setImageLoaded(true)}
+                onError={() => setImageLoaded(true)}
+              />
+            </>
           ) : (
-            <div 
+            <div
               className="w-full h-full flex items-center justify-center"
               style={{ backgroundColor: theme.primary }}
             >

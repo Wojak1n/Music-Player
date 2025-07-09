@@ -7,7 +7,7 @@ import { Song } from '../types';
 
 const LikedSongsPage: React.FC = () => {
   const { theme } = useTheme();
-  const { playSong, currentSong, isPlaying } = usePlayer();
+  const { playSong, playerState } = usePlayer();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('recent');
 
@@ -63,7 +63,7 @@ const LikedSongsPage: React.FC = () => {
       if (searchQuery) {
         return song.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                song.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
-               song.album.toLowerCase().includes(searchQuery.toLowerCase());
+               (song.album || '').toLowerCase().includes(searchQuery.toLowerCase());
       }
       return true;
     })
@@ -74,7 +74,7 @@ const LikedSongsPage: React.FC = () => {
         case 'artist':
           return a.artist.localeCompare(b.artist);
         case 'album':
-          return a.album.localeCompare(b.album);
+          return (a.album || '').localeCompare(b.album || '');
         case 'recent':
         default:
           return (b.likedAt?.getTime() || 0) - (a.likedAt?.getTime() || 0);
@@ -224,7 +224,7 @@ const LikedSongsPage: React.FC = () => {
             <div
               key={song.id}
               className="grid grid-cols-12 gap-4 px-4 py-2 rounded-lg hover:bg-opacity-10 transition-all duration-200 cursor-pointer group"
-              style={{ backgroundColor: currentSong?.id === song.id ? theme.primary + '20' : 'transparent' }}
+              style={{ backgroundColor: playerState.currentSong?.id === song.id ? theme.primary + '20' : 'transparent' }}
               onClick={() => playSong(song, filteredAndSortedSongs)}
             >
               <div className="col-span-1 flex items-center">

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { PlayerProvider } from './contexts/PlayerContext';
+import { ToastProvider } from './contexts/ToastContext';
 import Sidebar from './components/Sidebar';
 import MobileNavigation from './components/MobileNavigation';
 import MobileNowPlaying from './components/MobileNowPlaying';
@@ -32,7 +33,7 @@ const AppContent: React.FC = () => {
       case 'search':
         return <SearchPage />;
       case 'library':
-        return <LibraryPage />;
+        return <LibraryPage uploadedSongs={songs} />;
       case 'upload':
         return <UploadMusic onSongUpload={handleSongUpload} />;
       case 'liked':
@@ -73,9 +74,11 @@ const AppContent: React.FC = () => {
 function App() {
   return (
     <ThemeProvider>
-      <PlayerProvider>
-        <AppContent />
-      </PlayerProvider>
+      <ToastProvider>
+        <PlayerProvider>
+          <AppContent />
+        </PlayerProvider>
+      </ToastProvider>
     </ThemeProvider>
   );
 }

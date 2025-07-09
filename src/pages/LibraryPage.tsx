@@ -5,7 +5,11 @@ import { usePlayer } from '../contexts/PlayerContext';
 import SongCard from '../components/SongCard';
 import { Song } from '../types';
 
-const LibraryPage: React.FC = () => {
+interface LibraryPageProps {
+  uploadedSongs?: Song[];
+}
+
+const LibraryPage: React.FC<LibraryPageProps> = ({ uploadedSongs = [] }) => {
   const { theme } = useTheme();
   const { playSong } = usePlayer();
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
@@ -13,8 +17,8 @@ const LibraryPage: React.FC = () => {
   const [filterBy, setFilterBy] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Mock library data
-  const libraryItems: Song[] = [
+  // Mock library data combined with uploaded songs
+  const mockLibraryItems: Song[] = [
     {
       id: 'lib-1',
       title: 'Blinding Lights',
@@ -61,6 +65,9 @@ const LibraryPage: React.FC = () => {
     },
   ];
 
+  // Combine mock data with uploaded songs
+  const libraryItems = [...mockLibraryItems, ...uploadedSongs];
+
   const sortOptions = [
     { id: 'recent', label: 'Recently Added' },
     { id: 'title', label: 'Title' },
@@ -82,7 +89,7 @@ const LibraryPage: React.FC = () => {
       if (searchQuery) {
         return item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                item.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
-               item.album.toLowerCase().includes(searchQuery.toLowerCase());
+               (item.album || '').toLowerCase().includes(searchQuery.toLowerCase());
       }
       return true;
     })
@@ -93,7 +100,7 @@ const LibraryPage: React.FC = () => {
         case 'artist':
           return a.artist.localeCompare(b.artist);
         case 'album':
-          return a.album.localeCompare(b.album);
+          return (a.album || '').localeCompare(b.album || '');
         case 'duration':
           return a.duration - b.duration;
         case 'recent':

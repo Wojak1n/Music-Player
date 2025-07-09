@@ -43,38 +43,44 @@ const UploadMusic: React.FC<UploadMusicProps> = ({ onSongUpload }) => {
 
   const handleYoutubeUpload = async () => {
     if (!youtubeUrl.trim()) return;
-    
+
     setIsLoading(true);
     try {
-      // This would typically call your backend API
-      const response = await fetch('/api/youtube-audio', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ url: youtubeUrl }),
-      });
-
-      if (response.ok) {
-        const songData = await response.json();
-        const song: Song = {
-          id: Date.now().toString(),
-          title: songData.title,
-          artist: songData.artist || 'Unknown Artist',
-          duration: songData.duration || 0,
-          url: songData.audioUrl,
-          thumbnail: songData.thumbnail,
-          source: 'youtube',
-          uploadedAt: new Date(),
-        };
-        onSongUpload(song);
-        setYoutubeUrl('');
+      // For demo purposes, we'll create a mock song from YouTube URL
+      // In a real app, this would call your backend API
+      const videoId = extractYouTubeVideoId(youtubeUrl);
+      if (!videoId) {
+        alert('Please enter a valid YouTube URL');
+        return;
       }
+
+      // Mock song data - in real app this would come from your backend
+      const song: Song = {
+        id: Date.now().toString(),
+        title: 'YouTube Song', // Would be extracted from API
+        artist: 'YouTube Artist', // Would be extracted from API
+        duration: 180, // Would be extracted from API
+        url: youtubeUrl, // In real app, this would be the processed audio URL
+        thumbnail: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+        source: 'youtube',
+        uploadedAt: new Date(),
+      };
+
+      onSongUpload(song);
+      setYoutubeUrl('');
+      alert('YouTube upload feature is in demo mode. In a real app, this would process the audio.');
     } catch (error) {
       console.error('Error uploading YouTube audio:', error);
+      alert('Error processing YouTube URL. Please try again.');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const extractYouTubeVideoId = (url: string): string | null => {
+    const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
   };
 
   return (
